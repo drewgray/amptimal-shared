@@ -7,7 +7,7 @@ retry logic with configurable backoff strategies.
 import functools
 import logging
 import time
-from typing import Any, Callable, Optional, Tuple, Type, Union
+from typing import Any, Callable, Optional, Tuple, Type
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ def calculate_backoff(
         ...
         attempt 8+: 300s (capped)
     """
-    return min(base**attempt, max_backoff_seconds)
+    return int(min(base**attempt, max_backoff_seconds))
 
 
 def retry_with_backoff(

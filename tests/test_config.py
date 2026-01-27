@@ -1,7 +1,7 @@
 """Tests for configuration utilities."""
 import os
-import pytest
 from unittest.mock import patch
+
 from pydantic import Field
 
 from amptimal_shared.config import BaseServiceSettings, get_env_or_default
