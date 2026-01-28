@@ -1,10 +1,10 @@
 """Tests for retry utilities."""
-import asyncio
 import pytest
+
 from amptimal_shared.retry import (
+    async_retry_with_backoff,
     calculate_backoff,
     retry_with_backoff,
-    async_retry_with_backoff,
 )
 
 

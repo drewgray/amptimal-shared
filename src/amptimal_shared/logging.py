@@ -53,12 +53,12 @@ def setup_logging(
         logger = setup_logging("pr-reviewer")
         logger.info("Service started")
     """
-    level = level or os.getenv("LOG_LEVEL", "INFO")
+    log_level: str = level if level is not None else os.getenv("LOG_LEVEL", "INFO") or "INFO"
     if json_format is None:
         json_format = os.getenv("LOG_FORMAT", "text") == "json"
 
     logger = logging.getLogger(service_name)
-    logger.setLevel(getattr(logging, level.upper()))
+    logger.setLevel(getattr(logging, log_level.upper()))
 
     # Remove existing handlers to avoid duplicates
     logger.handlers = []

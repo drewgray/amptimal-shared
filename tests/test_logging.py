@@ -2,9 +2,9 @@
 import json
 import logging
 import os
-import pytest
 from unittest.mock import patch
-from amptimal_shared.logging import setup_logging, get_logger, JsonFormatter
+
+from amptimal_shared.logging import JsonFormatter, get_logger, setup_logging
 
 
 class TestSetupLogging:

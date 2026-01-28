@@ -1,6 +1,7 @@
 """Tests for health server."""
 import pytest
 from fastapi.testclient import TestClient
+
 from amptimal_shared.health import create_health_app
 
 

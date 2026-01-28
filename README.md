@@ -16,7 +16,7 @@ pip install git+https://github.com/drewgray/amptimal-shared.git
 pip install -e ".[dev]"
 ```
 
-## Usage
+## Modules
 
 ### Logging
 
@@ -32,9 +32,14 @@ child_logger = get_logger("my-service.worker")
 
 # JSON format (for production, set LOG_FORMAT=json)
 logger = setup_logging("my-service", json_format=True)
+
+# Override log level
+logger = setup_logging("my-service", level="DEBUG")
 ```
 
 ### Health Server
+
+Background HTTP server exposing `/health`, `/ready`, and `/metrics` endpoints.
 
 ```python
 from amptimal_shared import HealthServer
@@ -54,10 +59,32 @@ server = HealthServer(
 )
 server.start()
 
-# Endpoints available:
-# GET /health - Liveness probe (always 200 if running)
-# GET /ready  - Readiness probe (checks dependencies)
+# Endpoints:
+# GET /health  - Liveness probe (always 200 if running)
+# GET /ready   - Readiness probe (checks dependencies, returns status)
 # GET /metrics - Prometheus metrics
+
+# Access built-in metrics
+server.metrics["requests_total"].labels(status="success").inc()
+server.metrics["errors_total"].labels(error_type="timeout").inc()
+server.metrics["current_operation"].set(1)  # Processing
+server.metrics["last_success_timestamp"].set_to_current_time()
+
+# Graceful shutdown
+server.stop()
+```
+
+**Standalone FastAPI app** (for integration with existing servers):
+
+```python
+from amptimal_shared import create_health_app
+
+app = create_health_app(
+    service_name="my-service",
+    get_status=lambda: {"count": 10},
+    check_dependencies=lambda: True,
+)
+# Mount or run with uvicorn
 ```
 
 ### Retry with Backoff
@@ -73,11 +100,37 @@ from amptimal_shared import retry_with_backoff, calculate_backoff
 def fetch_data():
     ...
 
-# Manual backoff calculation
-delay = calculate_backoff(attempt=3)  # Returns 8 seconds
+# With callback on retry
+@retry_with_backoff(
+    max_attempts=3,
+    on_retry=lambda e, attempt: logger.warning(f"Retry {attempt}: {e}")
+)
+def api_call():
+    ...
+
+# Manual backoff calculation (2^attempt, capped at max)
+calculate_backoff(attempt=0)  # 1 second
+calculate_backoff(attempt=1)  # 2 seconds
+calculate_backoff(attempt=2)  # 4 seconds
+calculate_backoff(attempt=3)  # 8 seconds
+calculate_backoff(attempt=10, max_backoff_seconds=300)  # 300 seconds (capped)
+```
+
+**Async version:**
+
+```python
+from amptimal_shared.retry import async_retry_with_backoff
+
+result = await async_retry_with_backoff(
+    fetch_async_data,
+    max_attempts=5,
+    retryable_exceptions=(aiohttp.ClientError,),
+)
 ```
 
 ### Configuration
+
+Pydantic-based settings with environment variable loading.
 
 ```python
 from pydantic import Field
@@ -93,21 +146,38 @@ class MySettings(BaseServiceSettings):
 settings = MySettings()  # Loads from environment variables
 ```
 
+**Built-in fields** (from `BaseServiceSettings`):
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `log_level` | INFO | Log level |
+| `log_format` | text | Log format (text/json) |
+| `service_name` | service | Service name for logging/metrics |
+| `max_retry_attempts` | 3 | Default retry attempts |
+| `max_backoff_seconds` | 300 | Default max backoff |
+| `health_port` | 8080 | Health server port |
+
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `LOG_LEVEL` | INFO | Logging level |
+| `LOG_LEVEL` | INFO | Logging level (DEBUG, INFO, WARNING, ERROR) |
 | `LOG_FORMAT` | text | Logging format (text or json) |
 
-## Development
+## Running Tests
 
 ```bash
 # Install dev dependencies
 pip install -e ".[dev]"
 
-# Run tests
+# Run all tests
 pytest
+
+# Run with coverage
+pytest --cov=amptimal_shared --cov-report=term-missing
+
+# Run specific test file
+pytest tests/test_health.py
 
 # Type checking
 mypy src/
