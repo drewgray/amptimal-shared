@@ -130,7 +130,7 @@ settings = MySettings()  # Loads from env vars
 | Repo | Usage |
 |------|-------|
 | [amptimal-data](https://github.com/drewgray/amptimal-data) | 7+ microservices use logging, health, retry, config |
-| [claude-pr-reviewer](https://github.com/drewgray/claude-pr-reviewer) | 2 services use logging, health, config |
+| [amptimal-devops](https://github.com/drewgray/amptimal-devops) | 2 services use logging, health, config |
 
 ## Gotchas
 
