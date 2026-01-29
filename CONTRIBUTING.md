@@ -142,7 +142,7 @@ Add an entry under `[Unreleased]`:
 After merge, create issues in repos that might benefit:
 
 - [amptimal-data](https://github.com/drewgray/amptimal-data)
-- [claude-pr-reviewer](https://github.com/drewgray/claude-pr-reviewer)
+- [amptimal-devops](https://github.com/drewgray/amptimal-devops)
 
 ## PR Process
 
