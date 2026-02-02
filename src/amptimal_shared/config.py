@@ -6,7 +6,7 @@ Provides a base class for service configuration with common patterns.
 import os
 from typing import Optional
 
-from pydantic import Field
+from pydantic import ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 
@@ -40,9 +40,10 @@ class BaseServiceSettings(BaseSettings):
     # Health server
     health_port: int = Field(8080, description="Port for health check server")
 
-    class Config:
-        env_prefix = ""  # No prefix for env vars by default
-        case_sensitive = False
+    model_config = ConfigDict(
+        env_prefix="",  # No prefix for env vars by default
+        case_sensitive=False,
+    )
 
 
 def get_env_or_default(key: str, default: Optional[str] = None) -> Optional[str]:
