@@ -145,3 +145,10 @@ settings = MySettings()  # Loads from env vars
 - `CONTRIBUTING.md` - Contribution guidelines
 - `CHANGELOG.md` - Version history
 - `README.md` - Full documentation with examples
+
+---
+
+## Cross-Repo Standards
+
+- Versioning must follow `amptimal-root/docs/engineering/versioning-policy.md`.
+- Any breaking change requires a decision log entry in `amptimal-root/docs/decision-log.md`.
