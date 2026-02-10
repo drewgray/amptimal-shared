@@ -16,7 +16,19 @@ from amptimal_shared.retry import calculate_backoff, retry_with_backoff
 from amptimal_shared.secrets import clear_cache as clear_secrets_cache
 from amptimal_shared.secrets import get_secret
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
+
+
+def get_service_version(package_name: str) -> str:
+    """Get installed package version from metadata."""
+    from importlib.metadata import PackageNotFoundError
+    from importlib.metadata import version as _version
+
+    try:
+        return _version(package_name)
+    except PackageNotFoundError:
+        return "0.0.0-dev"
+
 
 __all__ = [
     # Auth
@@ -48,4 +60,6 @@ __all__ = [
     # Secrets
     "get_secret",
     "clear_secrets_cache",
+    # Version
+    "get_service_version",
 ]
